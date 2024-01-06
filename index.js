@@ -11,7 +11,7 @@ app.use(express.json())
 // mongodb Configuration
 
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0.2veuzlp.mongodb.net/?retryWrites=true&w=majority`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -30,6 +30,7 @@ async function run() {
 
     // create a collection of books
     const bookCollection= client.db('BookInventory').collection('books')
+     const reviewCollection = client.db("BookInventory").collection("Reviews");
 
 
     // insert a book to the database :post method
@@ -85,6 +86,22 @@ async function run() {
       }
       const result =await bookCollection.find(query).toArray()
       res.send(result)
+    })
+
+    // to get a single book
+
+    app.get('/book/:id',async(req,res)=>{
+      const id = req.params.id
+      const filter ={ _id: new ObjectId(id)}
+      const result =await bookCollection.findOne(filter)
+      res.send(result)
+
+    }) 
+
+      // reviews related
+      app.get('/Reviews',async(req,res)=>{
+        const result =await reviewCollection.find().toArray();
+        res.send(result)
     })
 
 
